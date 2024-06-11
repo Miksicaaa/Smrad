@@ -1,0 +1,133 @@
+  public partial class Form1 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        public static string upit;
+        public static string upit1;
+        public static string upit2;
+        string temp = "server=localhost;user id=root;password=asd123;database=fudbalski_stadion";
+        public static int radi = 0;
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+        private void load() {
+            listView1.Items.Clear();
+            textBox1.Text = "";
+            textBox2.Text = "";
+            textBox3.Text = "";
+            comboBox1.Items.Clear();
+            comboBox1.Text = "";
+            numericUpDown1.Value = 0;
+            numericUpDown2.Value = 0;
+
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            if (radi == 0)
+            {
+                upit = "select stadion.stadionid,stadion.naziv,grad.grad,stadion.kapacitet,stadion.adresa,stadion.brojulaza,grad.gradid from stadion inner JOIN grad on grad.gradid=stadion.gradid";
+            }
+            else
+            {
+                upit = upit1;
+            }
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            int k = tabela.Rows.Count;
+            for (int i = 0; i < k; i++)
+            {
+                string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                string s2 = tabela.Rows[i].ItemArray[1].ToString();
+                string s3 = tabela.Rows[i].ItemArray[2].ToString();
+                string s4 = tabela.Rows[i].ItemArray[3].ToString();
+                string s5 = tabela.Rows[i].ItemArray[4].ToString();
+                string s6 = tabela.Rows[i].ItemArray[5].ToString();
+                string s7 = tabela.Rows[i].ItemArray[6].ToString();
+
+                comboBox1.Items.Add(s3);
+                comboBox2.Items.Add(s7);
+                string[] red = { s1, s2, s3, s4, s5, s6 };
+                var ubaci = new ListViewItem(red);
+                listView1.Items.Add(ubaci);
+
+            }
+            rezultat.Close();
+            konekcija.Close();
+            radi = 0;
+        }
+        private void button4_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            load();
+        }
+
+        private void Form1_Activated(object sender, EventArgs e)
+        {
+            load();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Form3 f3 = new Form3();
+            f3.ShowDialog();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Form2 f2 = new Form2();
+            f2.ShowDialog();
+            
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count == 0) MessageBox.Show("Odaberite neki red");
+            else { 
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "update stadion set stadionid=" + textBox1.Text + " ,naziv = '" + textBox2.Text + "',adresa='" + textBox3.Text + "',kapacitet=" + numericUpDown1.Value + ",brojulaza=" + numericUpDown2.Value + ",gradid=" + comboBox2.Text + " where stadionid=" + textBox1.Text + "";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            rezultat.Close();
+            konekcija.Close();
+            load();
+            }
+        }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                textBox1.Text = listView1.SelectedItems[0].SubItems[0].Text;
+                textBox2.Text = listView1.SelectedItems[0].SubItems[1].Text;
+                comboBox1.Text = listView1.SelectedItems[0].SubItems[2].Text;
+                numericUpDown1.Value = Convert.ToDecimal(listView1.SelectedItems[0].SubItems[3].Text);
+                textBox3.Text = listView1.SelectedItems[0].SubItems[4].Text;
+                numericUpDown2.Value = Convert.ToDecimal(listView1.SelectedItems[0].SubItems[5].Text);
+            }
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox1.Items.Count > 0) {
+                comboBox2.SelectedIndex = comboBox1.SelectedIndex;
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+        }
+    }

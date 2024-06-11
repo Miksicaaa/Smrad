@@ -1,0 +1,222 @@
+ public partial class Form2 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost; user id=root; password=asd123; database=poliklinika_zakazivanje";
+        public Form2()
+        {
+            InitializeComponent();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+            load();
+            puniskrivenecombose();
+        }
+        private void load() {
+            punicombo1();
+        }
+        private void punicombo1() {
+            comboBox1.Items.Clear();
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT pacijent.pacijentid from pacijent";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            for (int i = 0; i < tabela.Rows.Count; i++)
+            {
+                string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                comboBox1.Items.Add(s1);
+            }
+
+            rezultat.Close();
+            konekcija.Close();
+        }
+        private void punilistview() {
+
+            richTextBox1.Text = "";
+            listView1.Items.Clear();
+
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT poliklinika.naziv as Klinika,concat(lekar.ime,' ',lekar.prezime) as Lekar,zakazivanje.datumzakazivanja as Datum,zakazivanje.Status as Status from zakazivanje INNER JOIN poliklinika on poliklinika.poliklinikaid=zakazivanje.poliklinikaid INNER JOIN lekar on lekar.lekarid=zakazivanje.lekarid WHERE zakazivanje.pacijentid="+comboBox1.Text;
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            if (tabela.Rows.Count == 0) MessageBox.Show("Nepostojeći LBO!");
+            else {
+                for (int i = 0; i < tabela.Rows.Count; i++)
+                {
+                    string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                    string s2 = tabela.Rows[i].ItemArray[1].ToString();
+                    string s3 = tabela.Rows[i].ItemArray[2].ToString().Substring(3, 2) + "." + tabela.Rows[i].ItemArray[2].ToString().Substring(0, 2) + "." + tabela.Rows[i].ItemArray[2].ToString().Substring(6, 4);
+                    string s4 = tabela.Rows[i].ItemArray[3].ToString();
+                    string[] red = { s1, s2, s3, s4 };
+                    var ubaci = new ListViewItem(red);
+                    listView1.Items.Add(ubaci);
+                }
+            rezultat.Close();
+            konekcija.Close();
+
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT concat(pacijent.ime,' ',pacijent.prezime) as Pacijent,pacijent.adresa as Adresa,pacijent.brojtelefona as BrojTelefona from pacijent WHERE pacijent.pacijentid=" + comboBox1.Text;
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+                for (int i = 0; i < tabela.Rows.Count; i++)
+                {
+                    string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                    string s2 = tabela.Rows[i].ItemArray[1].ToString();
+                    string s3 = tabela.Rows[i].ItemArray[2].ToString();
+                    richTextBox1.Text = "LBO: " + comboBox1.Text + "\n" + "Ime i prezime: " + s1 + "\n" + "Adresa: " + s2 + "\n" + "Telefon: " + s3;
+                }
+            rezultat.Close();
+            konekcija.Close();
+            }
+        }
+        private void button4_Click(object sender, EventArgs e)
+        {
+            punilistview();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "UPDATE zakazivanje set zakazivanje.status='Otkazan' where zakazivanje.pacijentid=" + comboBox1.Text + " And zakazivanje.poliklinikaid=" + comboBox3.Text + " and zakazivanje.lekarid=" + comboBox5.Text;
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            rezultat.Close();
+            konekcija.Close();
+            punilistview();
+        }
+        private void puniskrivenecombose() {
+            comboBox2.Items.Clear();
+            comboBox3.Items.Clear();
+            comboBox4.Items.Clear();
+            comboBox5.Items.Clear();
+            comboBox6.Items.Clear();
+
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT poliklinika.Naziv,poliklinika.poliklinikaid from poliklinika";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            for (int i = 0; i < tabela.Rows.Count; i++)
+            {
+                string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                string s2 = tabela.Rows[i].ItemArray[1].ToString();
+                comboBox2.Items.Add(s1);
+                comboBox3.Items.Add(s2);
+            }
+
+            rezultat.Close();
+            konekcija.Close();
+
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT concat(lekar.ime,' ',lekar.prezime),lekar.lekarid from lekar";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            for (int i = 0; i < tabela.Rows.Count; i++)
+            {
+                string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                string s2 = tabela.Rows[i].ItemArray[1].ToString();
+                comboBox4.Items.Add(s1);
+                comboBox5.Items.Add(s2);
+            }
+
+            rezultat.Close();
+            konekcija.Close();
+
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            comboBox3.SelectedIndex = comboBox2.SelectedIndex;
+        }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            comboBox2.Text = listView1.FocusedItem.SubItems[0].Text;
+            comboBox4.Text = listView1.FocusedItem.SubItems[1].Text;
+        }
+
+        private void comboBox4_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            comboBox5.SelectedIndex = comboBox4.SelectedIndex;
+        }
+
+        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+        {
+            dateTimePicker2.Value = dateTimePicker1.Value;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (comboBox6.Items.Contains(dateTimePicker1.Text)) MessageBox.Show("Probajte neki drugi datum!");
+
+            else { 
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "UPDATE zakazivanje set zakazivanje.datumzakazivanja='"+dateTimePicker2.Text+"' where zakazivanje.pacijentid=" + comboBox1.Text + " And zakazivanje.poliklinikaid=" + comboBox3.Text + " and zakazivanje.lekarid=" + comboBox5.Text;
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            rezultat.Close();
+            konekcija.Close();
+            punilistview();
+            }
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox1.Text != "") { 
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT zakazivanje.datumzakazivanja from zakazivanje where zakazivanje.pacijentid=" + comboBox1.Text;
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            for (int i = 0; i < tabela.Rows.Count; i++)
+            {
+                string s1 = tabela.Rows[i].ItemArray[0].ToString().Substring(3, 2) + "." + tabela.Rows[i].ItemArray[0].ToString().Substring(0, 2) + "." + tabela.Rows[i].ItemArray[0].ToString().Substring(6, 4);
+                comboBox6.Items.Add(s1);
+            }
+
+            rezultat.Close();
+            konekcija.Close();
+            }
+        }
+    }

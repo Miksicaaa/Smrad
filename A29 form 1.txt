@@ -1,0 +1,183 @@
+   public partial class Form1 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        DataTable tabela2 = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost; user id=root; password=asd123; database=golf_tereni2";
+        string razmak = "                    ";
+        bool postoji;
+        public Form1()
+        {
+            InitializeComponent();
+        }
+        private void load()
+        {
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT * from igrac";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            listBox1.Items.Clear();
+            for (int i = 0; i < tabela.Rows.Count; i++)
+            {
+                string s1 = (tabela.Rows[i].ItemArray[0].ToString()+razmak).Substring(0, 5);
+                string s2 = (tabela.Rows[i].ItemArray[1].ToString() + razmak ).Substring(0, 10);
+                string s3 = (tabela.Rows[i].ItemArray[2].ToString() + razmak ).Substring(0, 15);
+                string s4 = (tabela.Rows[i].ItemArray[3].ToString() + razmak).Substring(0, 23);
+                string s5 = (tabela.Rows[i].ItemArray[4].ToString() + razmak).Substring(0, 10);
+                string s6 = (tabela.Rows[i].ItemArray[5].ToString() + razmak).Substring(0, 30);
+                string s7 = (tabela.Rows[i].ItemArray[6].ToString() + razmak).Substring(0, 20);
+                string ceo = s1 + s2 + s3 + s4 + s5 + s6 + s7;
+                listBox1.Items.Add(ceo);
+            }
+            rezultat.Close();
+            konekcija.Close();
+        }
+        private void gradload()
+        {
+
+            
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT * from grad";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela2.Reset();
+            tabela2.Load(rezultat);
+            comboBox2.Items.Clear();
+            comboBox3.Items.Clear();
+            comboBox2.Items.Add("");
+            comboBox3.Items.Add("");
+            for (int i = 0; i < tabela2.Rows.Count; i++)
+            {
+                string s1 = (tabela2.Rows[i].ItemArray[0].ToString());
+                string s2 = (tabela2.Rows[i].ItemArray[1].ToString());
+                comboBox3.Items.Add(s1);
+                comboBox2.Items.Add(s2);
+            }
+            rezultat.Close();
+            konekcija.Close();
+        }
+        private void izlazToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void unesiNovogIgračaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //Form1 f1 = new Form1();
+            //f1.ShowDialog();
+        }
+
+        private void analizaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form2 f2 = new Form2();
+            f2.ShowDialog();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            load();
+            gradload();
+        }
+
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            comboBox3.SelectedIndex = comboBox2.SelectedIndex;
+        }
+
+        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            comboBox2.SelectedIndex = comboBox3.SelectedIndex;
+        }
+
+        private void listBox1_Click(object sender, EventArgs e)
+        {
+            int k = listBox1.SelectedIndex;
+            textBox6.Text = tabela.Rows[k].ItemArray[0].ToString();
+            comboBox1.Text = textBox6.Text;
+            textBox1.Text = tabela.Rows[k].ItemArray[1].ToString();
+            textBox2.Text = tabela.Rows[k].ItemArray[2].ToString();
+            textBox3.Text = tabela.Rows[k].ItemArray[3].ToString();
+            comboBox3.Text= tabela.Rows[k].ItemArray[4].ToString();
+            textBox4.Text = tabela.Rows[k].ItemArray[5].ToString();
+            textBox5.Text = tabela.Rows[k].ItemArray[6].ToString();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            button2.Visible = true;
+            button3.BringToFront();
+            comboBox1.Enabled = true;
+            comboBox2.Enabled = true;
+            textBox1.Enabled = true;
+            textBox2.Enabled = true;
+            textBox3.Enabled = true;
+            textBox4.Enabled = true;
+            textBox5.Enabled = true;
+            textBox6.Enabled = true;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            button1.BringToFront();
+            comboBox1.Text = "";
+            comboBox2.Text = "";
+            textBox1.Text = "";
+            textBox2.Text = "";
+            textBox3.Text = "";
+            textBox4.Text = "";
+            textBox5.Text = "";
+            textBox6.Text = "";
+
+            comboBox1.Enabled = false;
+            comboBox2.Enabled = false;
+            textBox1.Enabled = false;
+            textBox2.Enabled = false;
+            textBox3.Enabled = false;
+            textBox4.Enabled = false;
+            textBox5.Enabled = false;
+            textBox6.Enabled = false;
+            listBox1.SelectedIndex = -1;
+            button2.Visible = false;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+
+            if (textBox6.Text == comboBox1.Text) { MessageBox.Show("SIFRA POSTOJECA! MORAS NEKU DRUGU!"); }
+            else{ 
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+                upit = "INSERT INTO igrac (IGRACID, IME, PREZIME, ADRESA, GRADID, EMAIL, TELEFON) VALUES('"+textBox6.Text+ "', '" + textBox1.Text + "', '" + textBox2.Text + "', '" + textBox3.Text + "', '" + comboBox3.Text + "', '" + textBox4.Text + "', '" + textBox5.Text + "')";
+                MessageBox.Show(upit);
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                tabela2.Reset();
+                tabela2.Load(rezultat);
+                rezultat.Close();
+                konekcija.Close();
+
+                button2.PerformClick();
+            load();
+            gradload();
+             
+            }
+
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+    }

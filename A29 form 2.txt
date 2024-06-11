@@ -1,0 +1,58 @@
+  public partial class Form2 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost;user id=root;password=asd123;database=golf_tereni2";
+        public Form2()
+        {
+            InitializeComponent();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            label7.Text = textBox1.Text + "-" + comboBox3.Text + "-" + comboBox1.Text;
+            label8.Text = textBox2.Text + "-" + comboBox4.Text + "-" + comboBox2.Text;
+
+            DataTable tabela2 = new DataTable();
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+
+            upit = "SELECT partija.TERENID,teren.TEREN as Naziv,COUNT(teren.TEREN) as Broj from partija INNER JOIN teren on partija.TERENID = teren.TERENID WHERE " +
+                "partija.DATUM >= '" + label7.Text + "' AND partija.DATUM <= '" + label8.Text + "' GROUP by teren.TEREN";
+            MessageBox.Show(upit);
+
+
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+
+            chart1.ChartAreas[0].AxisX.Title = "Teren";
+            chart1.ChartAreas[0].AxisY.Title = "Broj";
+
+            tabela2.Load(rezultat);
+
+            dataGridView1.DataSource = tabela2;
+
+            chart1.DataSource = tabela2;
+            chart1.Series["Series1"].XValueMember = "Naziv";
+            chart1.Series["Series1"].YValueMembers = "Broj";
+            rezultat.Close();
+            konekcija.Close();
+            
+        }
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+
+        }
+    }

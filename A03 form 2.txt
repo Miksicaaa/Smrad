@@ -1,0 +1,55 @@
+ public partial class Form2 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost;user id=root;password=asd123;database=evidencija_radnika";
+        public Form2()
+        {
+            InitializeComponent();
+        }
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            chart1.Titles.Clear();
+            chart1.Titles.Add("Grafik proseka projekta");
+            int id;
+            id = 2023-Convert.ToInt16(numericUpDown1.Value);
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT year(projekat.datumpocetka) as datum_pocetka,count(projekat.projekatid) as broj_projekata,count(angazman.radnikid) as broj_radnika FROM projekat INNER JOIN angazman ON projekat.projekatid = angazman.projekatid where year(projekat.datumpocetka)>'" + id + "' GROUP BY(year(projekat.datumpocetka))";
+
+            DataTable tabela2 = new DataTable();
+
+
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            chart1.ChartAreas[0].AxisX.Title = "Godina";
+            chart1.ChartAreas[0].AxisY.Title = "Prosecna Cena";
+
+
+            tabela2.Load(rezultat);
+            dataGridView1.DataSource = tabela2;
+            chart1.DataSource = tabela2;
+            chart1.Series["prosek"].XValueMember = "datum_pocetka";
+            chart1.Series["prosek"].YValueMembers = "broj_radnika";
+
+            rezultat.Close();
+            konekcija.Close();
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e) // OVO RADIM DA BI NA SVAKU PROMENU ODRADIO NOVI CHART
+        {
+            button1.PerformClick();
+        }
+    }

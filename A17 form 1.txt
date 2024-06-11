@@ -1,0 +1,422 @@
+ public partial class Form1 : Form
+    {
+        string v1 = "                       ";
+        string model, boja, gorivo;
+        int mid, bid, gid;
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost;user id=root;password=asd123;database=evidencija_vozila";
+        Form f2 = new Form2();
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void load() {
+            listBox1.Items.Clear();
+                comboBox1.Items.Clear();
+                comboBox2.Items.Clear();
+                comboBox3.Items.Clear();
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+                upit = "select * from vozilo";
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                tabela.Reset();
+                tabela.Load(rezultat);
+                int k = tabela.Rows.Count;
+
+                for (int i = 0; i < k; i++)
+                {
+                    string s1 = (tabela.Rows[i].ItemArray[0].ToString() + v1).Substring(0, 15);
+                    string s2 = (tabela.Rows[i].ItemArray[1].ToString() + v1).Substring(0, 15);
+                    string s3 = (tabela.Rows[i].ItemArray[2].ToString().Substring(6, 4) + v1).Substring(0, 15);
+                    string s4 = (tabela.Rows[i].ItemArray[3].ToString() + v1).Substring(0, 15);
+                    string s5 = (tabela.Rows[i].ItemArray[4].ToString() + v1).Substring(0, 15);
+
+                    string s6 = (tabela.Rows[i].ItemArray[5].ToString() + v1).Substring(0, 15);
+
+                    string s7 = (tabela.Rows[i].ItemArray[6].ToString() + v1).Substring(0, 15);
+
+                    string s8 = (tabela.Rows[i].ItemArray[7].ToString() + v1).Substring(0, 15);
+                    string s9 = s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
+
+                    listBox1.Items.Add(s9);
+                    //listView1.Items.Add(red);
+                }
+                rezultat.Close();
+                konekcija.Close();
+
+
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+                upit = "select Naziv from model";
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                tabela.Reset();
+                tabela.Load(rezultat);
+                int g = tabela.Rows.Count;
+                for (int i = 0; i < g; i++)
+                {
+                    string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                    comboBox1.Items.Add(s1);
+
+                }
+                rezultat.Close();
+                konekcija.Close();
+                //2
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+                upit = "select Naziv from boja";
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                tabela.Reset();
+                tabela.Load(rezultat);
+                int h = tabela.Rows.Count;
+                for (int i = 0; i < h; i++)
+                {
+                    string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                    comboBox2.Items.Add(s1);
+
+                }
+                rezultat.Close();
+                konekcija.Close();
+                //3
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+                upit = "select Naziv from gorivo";
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                tabela.Reset();
+                tabela.Load(rezultat);
+                int j = tabela.Rows.Count;
+                for (int i = 0; i < j; i++)
+                {
+                    string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                    comboBox3.Items.Add(s1);
+
+                }
+                rezultat.Close();
+                konekcija.Close();
+            
+        }
+
+        
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            load();
+        }
+
+        private void listBox1_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            textBox1.Enabled = true;
+            textBox2.Enabled = true;
+            textBox3.Enabled = true;
+            textBox4.Enabled = true;
+            textBox5.Enabled = true;
+            comboBox1.Enabled = true;
+            comboBox2.Enabled = true;
+            comboBox3.Enabled = true;
+
+            button3.Visible = true;
+            button2.BringToFront();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedIndex == -1) MessageBox.Show("Odaberite neko vozilo!");
+            else
+            {
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+                upit = "select ModelID from model where Naziv='" + comboBox1.Text + "' ";
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                tabela.Reset();
+                tabela.Load(rezultat);
+                int h = tabela.Rows.Count;
+                for (int i = 0; i < h; i++)
+                {
+                    string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                    mid = Convert.ToInt16(s1);
+
+                }
+                rezultat.Close();
+                konekcija.Close();
+                //
+                //
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+                upit = "select BojaID from boja where Naziv='" + comboBox2.Text + "' ";
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                tabela.Reset();
+                tabela.Load(rezultat);
+                int k = tabela.Rows.Count;
+                for (int i = 0; i < k; i++)
+                {
+                    string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                    bid = Convert.ToInt16(s1);
+
+                }
+                rezultat.Close();
+                konekcija.Close();
+                //
+                //
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+                upit = "select GorivoID from gorivo where Naziv='" + comboBox3.Text + "' ";
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                tabela.Reset();
+                tabela.Load(rezultat);
+                int p = tabela.Rows.Count;
+                for (int i = 0; i < p; i++)
+                {
+                    string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                    gid = Convert.ToInt16(s1);
+
+                }
+                rezultat.Close();
+                konekcija.Close();
+                //
+
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+
+                upit = "update vozilo set Registracija='" + textBox2.Text + "' ,GodinaProizvodnje = '" + textBox3.Text + "/01/01',PredjenoKM=" + textBox4.Text + ",Cena=" + textBox5.Text + ",ModelID=" + mid + ",GorivoID=" + gid + ",BojaID=" + bid + " where VoziloID=" + textBox1.Text + "";
+                //
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                rezultat.Close();
+                konekcija.Close();
+                listBox1.Items.Clear();
+                MessageBox.Show("Uspesna izmena!");
+                textBox1.Text = "";
+                textBox2.Text = "";
+                textBox3.Text = "";
+                textBox4.Text = "";
+                textBox5.Text = "";
+                comboBox1.Text = "";
+                comboBox2.Text = "";
+                comboBox3.Text = "";
+                load();
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            listBox1.SelectedIndex = -1;
+            textBox1.Enabled = false;
+            textBox2.Enabled = false;
+            textBox3.Enabled = false;
+            textBox4.Enabled = false;
+            textBox5.Enabled = false;
+            comboBox1.Enabled = false;
+            comboBox2.Enabled = false;
+            comboBox3.Enabled = false;
+            textBox1.Text = "";
+            textBox2.Text = "";
+            textBox3.Text = "";
+            textBox4.Text = "";
+            textBox5.Text = "";
+            comboBox1.Text = "";
+            comboBox2.Text = "";
+            comboBox3.Text = "";
+            button1.BringToFront();
+            button3.Visible = false;
+            load();
+            
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter) { 
+                if (textBox1.Text != "")
+                {
+                    konekcija.ConnectionString = temp;
+                    konekcija.Open();
+                    komanda.Connection = konekcija;
+                    upit = "select * from vozilo where voziloid="+textBox1.Text;
+                    komanda.CommandText = upit;
+                    rezultat = komanda.ExecuteReader();
+                    tabela.Reset();
+                    tabela.Load(rezultat);
+                    int k = tabela.Rows.Count;
+                    if (tabela.Rows.Count > 0)
+                    {
+                        listBox1.Items.Clear();
+                        for (int i = 0; i < k; i++)
+                        {
+                            string s1 = (tabela.Rows[i].ItemArray[0].ToString() + v1).Substring(0, 15);
+                            string s2 = (tabela.Rows[i].ItemArray[1].ToString() + v1).Substring(0, 15);
+                            string s3 = (tabela.Rows[i].ItemArray[2].ToString().Substring(6, 4) + v1).Substring(0, 15);
+                            string s4 = (tabela.Rows[i].ItemArray[3].ToString() + v1).Substring(0, 15);
+                            string s5 = (tabela.Rows[i].ItemArray[4].ToString() + v1).Substring(0, 15);
+
+                            string s6 = (tabela.Rows[i].ItemArray[5].ToString() + v1).Substring(0, 15);
+
+                            string s7 = (tabela.Rows[i].ItemArray[6].ToString() + v1).Substring(0, 15);
+
+                            string s8 = (tabela.Rows[i].ItemArray[7].ToString() + v1).Substring(0, 15);
+                            string s9 = s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
+
+                            listBox1.Items.Add(s9);
+                        }
+                        rezultat.Close();
+                        konekcija.Close();
+                        listBox1.SelectedIndex = 0;
+                    }
+                    else {
+                        rezultat.Close();
+                        konekcija.Close();
+                        MessageBox.Show("Uneta sifra ne postoji!");
+                    }
+                    
+
+                }
+                else {
+                    load();
+                }
+            }
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedIndex > -1)
+            {
+                textBox1.Text = Convert.ToInt32(listBox1.SelectedItem.ToString().Substring(0, 15)).ToString();
+
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+                upit = "select * from vozilo where VoziloID=" + textBox1.Text + "";
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                tabela.Reset();
+                tabela.Load(rezultat);
+                int k = tabela.Rows.Count;
+
+                for (int i = 0; i < k; i++)
+                {
+                    string s1 = tabela.Rows[i].ItemArray[0].ToString();//voziloID
+                    textBox1.Text = s1;
+                    string s2 = tabela.Rows[i].ItemArray[1].ToString();//Registracija
+                    textBox2.Text = s2;
+                    string s3 = tabela.Rows[i].ItemArray[2].ToString();//GODINA PROIZVODJE
+                    textBox3.Text = s3.Substring(6, 4);
+                    string s4 = tabela.Rows[i].ItemArray[3].ToString();//predjenokm
+                    textBox4.Text = s4;
+                    string s5 = tabela.Rows[i].ItemArray[4].ToString();//modelid
+                    model = s5;
+                    string s6 = tabela.Rows[i].ItemArray[5].ToString();//bojaid
+                    boja = s6;
+
+                    string s7 = tabela.Rows[i].ItemArray[6].ToString();//gorivod
+                    gorivo = s7;
+                    string s8 = tabela.Rows[i].ItemArray[7].ToString();//cena
+                    textBox5.Text = s8;
+                    string[] zapis = { s1, s2, s3, s4, s5, s6, s7 };
+                    var red = new ListViewItem(zapis);
+
+                }
+                rezultat.Close();
+                konekcija.Close();
+                //1
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+
+                upit = "select Naziv from model where ModelID=" + Convert.ToInt16(model) + "";
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                tabela.Reset();
+                tabela.Load(rezultat);
+                int j = tabela.Rows.Count;
+                for (int i = 0; i < j; i++)
+                {
+                    string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                    comboBox1.Text = s1;
+
+                }
+                rezultat.Close();
+                konekcija.Close();
+                //2
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+
+                upit = "select Naziv from boja where BojaID=" + Convert.ToInt16(boja) + "";
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                tabela.Reset();
+                tabela.Load(rezultat);
+                int g = tabela.Rows.Count;
+                for (int i = 0; i < g; i++)
+                {
+                    string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                    comboBox2.Text = s1;
+
+                }
+                rezultat.Close();
+                konekcija.Close();
+                //3
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+
+                upit = "select Naziv from gorivo where GorivoID=" + Convert.ToInt16(gorivo) + "";
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                tabela.Reset();
+                tabela.Load(rezultat);
+                int h = tabela.Rows.Count;
+                for (int i = 0; i < h; i++)
+                {
+                    string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                    comboBox3.Text = s1;
+
+                }
+                rezultat.Close();
+                konekcija.Close();
+            }
+        
+    }
+
+        private void izlazToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void analizaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            f2.ShowDialog();
+        }
+
+        private void aplikacijaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+    }

@@ -1,0 +1,83 @@
+ public partial class Form2 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost; user id=root; password=asd123; database=evidencija_vozila";
+        public Form2()
+        {
+            InitializeComponent();
+        }
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "select * from model";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Load(rezultat);
+            int k = tabela.Rows.Count;
+            comboBox1.Items.Clear();
+            for (int i = 0; i < k; i++)
+            {
+                string s2 = tabela.Rows[i].ItemArray[1].ToString();
+                string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                comboBox1.Items.Add(s2);
+                comboBox2.Items.Add(s1);
+            }
+            rezultat.Close();
+            konekcija.Close();
+        }
+
+        private void comboBox1_TextChanged(object sender, EventArgs e)
+        {
+            comboBox2.SelectedIndex = comboBox1.SelectedIndex;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            chart1.Titles.Clear();
+            chart1.Titles.Add("Grafik prosečne cene");
+            string id;
+            id = comboBox2.Text;
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT GodinaProizvodnje, avg(Cena) AS ProsecnaCena FROM vozilo where ModelID=" + id + " GROUP BY GodinaProizvodnje";
+            //MessageBox.Show(upit);
+            DataTable tabela2 = new DataTable();
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            chart1.ChartAreas[0].AxisX.Title = "Godina";
+            chart1.ChartAreas[0].AxisY.Title = "Prosečna cena";
+            tabela2.Load(rezultat);
+            dataGridView1.DataSource = tabela2;
+            chart1.DataSource = tabela2;
+            chart1.Series["prosek"].XValueMember = "GodinaProizvodnje";
+            chart1.Series["prosek"].YValueMembers = "ProsecnaCena";
+            //MessageBox.Show("evo");
+            rezultat.Close();
+            konekcija.Close();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+    }

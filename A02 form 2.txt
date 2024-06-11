@@ -1,0 +1,83 @@
+ public partial class Form2 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost;user id=root;password=asd123;database=biblioteka";
+        public Form2()
+        {
+            InitializeComponent();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Close(); 
+        }
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+            comboBox1.Items.Clear();
+
+
+
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "select * from autor";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            int k = tabela.Rows.Count;
+
+            for (int i = 0; i < k; i++)
+            {
+                string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                string s2 = tabela.Rows[i].ItemArray[1].ToString();
+                string s3 = tabela.Rows[i].ItemArray[2].ToString();
+                comboBox1.Items.Add(s2+" "+s3);
+                comboBox2.Items.Add(s1);
+
+
+            }
+            rezultat.Close();
+            konekcija.Close();
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            comboBox2.SelectedIndex = comboBox1.SelectedIndex;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            int godina = 2023 - Convert.ToInt16(numericUpDown1.Value);
+            chart1.Titles.Clear();
+            chart1.Titles.Add("Grafik izdatih knjiga za određenu godinu");
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT YEAR(nacitanju.datumuzimanja) as Godina,COUNT(nacitanju.knjigaid) as Broj FROM nacitanju INNER JOIN napisali on nacitanju.knjigaid=napisali.knjigaid INNER JOIN autor on napisali.autorid=autor.autorid WHERE autor.autorid="+comboBox2.Text+ " AND YEAR(nacitanju.datumuzimanja)>="+godina+" GROUP by YEAR(nacitanju.datumuzimanja)";
+
+            DataTable tabela2 = new DataTable();
+
+
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            chart1.ChartAreas[0].AxisX.Title = "Godina";
+            chart1.ChartAreas[0].AxisY.Title = "Broj knjiga";
+
+
+            tabela2.Load(rezultat);
+            dataGridView1.DataSource = tabela2;
+            chart1.DataSource = tabela2;
+            chart1.Series["Broj knjiga"].XValueMember = "Godina";
+            chart1.Series["Broj knjiga"].YValueMembers = "Broj";
+            rezultat.Close();
+            konekcija.Close();
+        }
+    }

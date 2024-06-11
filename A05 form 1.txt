@@ -1,0 +1,112 @@
+public partial class Form1 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost;user id=root;password=asd123;database=produzeni_boravak";
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            load();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+        private void load() {
+            listView1.Items.Clear();
+            textBox1.Text = "";
+            textBox2.Text = "";
+            comboBox1.Items.Clear();
+            textBox3.Text = "";
+            textBox4.Text = "";
+
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "select * from aktivnosti";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            int k = tabela.Rows.Count;
+            for (int i = 0; i < k; i++)
+            {
+                string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                string s2 = tabela.Rows[i].ItemArray[1].ToString();
+                string s3 = tabela.Rows[i].ItemArray[2].ToString();
+                if (comboBox1.Items.Contains(s3)) { } else comboBox1.Items.Add(s3);
+                string s4 = tabela.Rows[i].ItemArray[3].ToString();
+                string s5 = tabela.Rows[i].ItemArray[4].ToString();
+
+                string[] red = { s1, s2, s3, s4, s5 };
+                var ubaci = new ListViewItem(red);
+                listView1.Items.Add(ubaci);
+
+            }
+            rezultat.Close();
+            konekcija.Close();
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            Form2 f2 = new Form2();
+            f2.ShowDialog();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            bool radi = true;
+            listView1.Items.Clear();
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "select * from aktivnosti where aktivnostid='" + textBox1.Text + "'";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            int k = tabela.Rows.Count;
+            if (k > 0)
+            {
+                radi = false;
+                MessageBox.Show("GDE SI KRENO... NE MOZE TAJ BROJ... DAJ DRUGI!!!");
+            }
+
+            if (radi == true)
+            {
+                upit = "insert into aktivnosti(aktivnostid,nazivaktivnosti,dan,pocetak,zavrsetak) values ";
+                upit += "(" + textBox1.Text + ",'" + textBox2.Text + "','" + comboBox1.Text + "','" + textBox3.Text + "','" + textBox4.Text + "')";
+            }
+
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+
+            rezultat.Close();
+            konekcija.Close();
+            load();
+        }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                textBox1.Text = listView1.SelectedItems[0].SubItems[0].Text;
+                textBox2.Text = listView1.SelectedItems[0].SubItems[1].Text;
+                textBox3.Text = listView1.SelectedItems[0].SubItems[3].Text;
+                textBox4.Text = listView1.SelectedItems[0].SubItems[4].Text;
+                comboBox1.Text = listView1.SelectedItems[0].SubItems[2].Text;
+            }
+        }
+    }

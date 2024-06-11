@@ -1,0 +1,82 @@
+public partial class Form2 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        DataTable tabela2 = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost; user id=root; password=asd123; database=ribolovacko_drustvo";
+        public Form2()
+        {
+            InitializeComponent();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+            comboBox1.Items.Clear();
+            comboBox2.Items.Clear();
+
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT concat(ime,' ',prezime),PecarosID FROM pecaros";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            int k = tabela.Rows.Count;
+            for (int i = 0; i < k; i++)
+            {
+                string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                string s2 = tabela.Rows[i].ItemArray[1].ToString();
+                comboBox1.Items.Add(s2+ " - "+s1);
+                comboBox2.Items.Add(s2);
+            }
+            rezultat.Close();
+            konekcija.Close();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DataTable tabela2 = new DataTable();
+
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT vrsta_ribe.Naziv as Naziv,ulov.RbrUlova as Broj FROM ulov INNER join vrsta_ribe on vrsta_ribe.VrstaID=ulov.VrstaID " 
+                + "INNER JOIN pecaros on pecaros.PecarosID=ulov.PecarosID where pecaros.PecarosID=" + comboBox2.Text.ToString() + " and ulov.Datum>='" + dateTimePicker2.Text +"'"+ " and ulov.Datum<='" + dateTimePicker1.Text.ToString()+"'" 
+                + " GROUP BY vrsta_ribe.Naziv";
+            MessageBox.Show(upit);
+
+            
+
+      
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            chart1.ChartAreas[0].AxisX.Title = "Vrsta";
+            chart1.ChartAreas[0].AxisY.Title = "Redni broj";
+
+
+            tabela2.Load(rezultat);
+            dataGridView1.DataSource = tabela2;
+            chart1.DataSource = tabela2;
+            chart1.Series["Series1"].XValueMember = "Naziv";
+            chart1.Series["Series1"].YValueMembers = "Broj";
+
+            rezultat.Close();
+            konekcija.Close();
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            comboBox2.SelectedIndex = comboBox1.SelectedIndex;
+        }
+    }

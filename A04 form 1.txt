@@ -1,0 +1,171 @@
+ public partial class Form1 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        DataTable tabela1 = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost;user id=root;password=asd123;database=seoski_turizam";
+        string koristim = " ";
+        int broj = 0;
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void pictureBox3_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            Form2 f2 = new Form2();
+            f2.ShowDialog();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            function();
+        }
+        private void function()
+        {
+            listView1.Items.Clear();
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT selo.SeloID,selo.Naziv,grad.Grad FROM `selo` INNER join grad on grad.GradID=selo.GradID WHERE 1";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            int k = tabela.Rows.Count;
+            for (int i = 0; i < k; i++)
+            {
+                string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                string s2 = tabela.Rows[i].ItemArray[1].ToString();
+                string s3 = tabela.Rows[i].ItemArray[2].ToString();
+                comboBox1.Items.Add(s3);
+                string[] row = { s1, s2, s3 };
+                var listViewItem = new ListViewItem(row);
+                listView1.Items.Add(listViewItem);
+
+
+            }
+            rezultat.Close();
+            konekcija.Close();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT GradID FROM `grad` WHERE Grad='" + comboBox1.Text + "'";
+
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela1.Reset();
+            tabela1.Load(rezultat);
+            int k = tabela1.Rows.Count;
+            for (int i = 0; i < k; i++)
+            {
+                koristim = tabela1.Rows[i].ItemArray[0].ToString();
+                broj = Convert.ToInt32(koristim);
+            }
+            rezultat.Close();
+            konekcija.Close();
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = " UPDATE selo  INNER JOIN grad  ON grad.GradID = selo.GradID  SET selo.GradID = " + broj + " WHERE selo.SeloID=" + textBox1.Text + ";";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            rezultat.Close();
+            konekcija.Close();
+            MessageBox.Show("Uspesna izmena!");
+            function();
+
+
+
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = " UPDATE selo  INNER JOIN grad  ON grad.GradID = selo.GradID  SET selo.Naziv = '" + textBox2.Text + "' WHERE selo.SeloID=" + textBox1.Text + ";";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            rezultat.Close();
+            konekcija.Close();
+            function();
+        }
+
+        private void listView1_Click(object sender, EventArgs e)
+        {
+            string text = listView1.SelectedItems[0].Text;
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+
+            upit = "SELECT selo.SeloID,selo.Naziv,grad.Grad FROM `selo` INNER join grad on grad.GradID=selo.GradID WHERE selo.SeloID=" + listView1.SelectedItems[0].Text + "";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            int k = tabela.Rows.Count;
+            for (int i = 0; i < k; i++)
+            {
+                string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                string s2 = tabela.Rows[i].ItemArray[1].ToString();
+                string s3 = tabela.Rows[i].ItemArray[2].ToString();
+                textBox1.Text = s1;
+                comboBox1.SelectedItem = s3;
+                textBox2.Text = s2;
+
+
+
+            }
+            rezultat.Close();
+            konekcija.Close();
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e) // AKO OCETE AUTOMATSKI DA NE MORATE ENTER DA KLIKCETE PREBACITE OVAJ KOD U TEXTCHANGED DOLE
+        {
+            listView1.SelectedItems.Clear();
+            textBox2.Text = "";
+            comboBox1.SelectedIndex = -1;
+
+            for (int i = 0; i < listView1.Items.Count; i++)
+            {
+                if (textBox1.Text == listView1.Items[i].SubItems[0].Text)
+                {
+                    listView1.Items[i].Selected = true;
+                    textBox2.Text = listView1.Items[i].SubItems[1].Text;
+                    comboBox1.SelectedItem = listView1.Items[i].SubItems[2].Text;
+                }
+            }
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+    }

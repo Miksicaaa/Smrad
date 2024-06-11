@@ -1,0 +1,39 @@
+ public partial class Form3 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost;user id=root;password=asd123;database=fudbalski_stadion";
+        public Form3()
+        {
+            InitializeComponent();
+        }
+
+        private void Form3_Load(object sender, EventArgs e)
+        {
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "select count(utakmica.utakmicaid) as dani,stadion.naziv as nazivv from stadion inner JOIN klub on klub.stadionid=stadion.stadionid inner join utakmica on klub.klubid=utakmica.domacinid GROUP BY utakmica.domacinid";
+
+            DataTable tabela2 = new DataTable();
+
+
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+
+
+            tabela2.Load(rezultat);
+           // dataGridView1.DataSource = tabela2;
+            chart1.DataSource = tabela2;
+            chart1.Series["prosek"].XValueMember = "nazivv";
+            chart1.Series["prosek"].YValueMembers = "dani";
+
+            rezultat.Close();
+            konekcija.Close();
+        }
+    }

@@ -1,0 +1,105 @@
+  public partial class Form1 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost;user id=root;password=asd123;database=evidencija_radnika";
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void load() {
+            listView1.Items.Clear();
+            textBox1.Text = "";
+            textBox2.Text = "";
+
+            textBox3.Text = "";
+            textBox4.Text = "";
+            checkBox1.Checked = false;
+            richTextBox1.Text = "";
+
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "select * from projekat";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            int k = tabela.Rows.Count;
+
+            for (int i = 0; i < k; i++)
+            {
+                string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                string s2 = tabela.Rows[i].ItemArray[1].ToString();
+                string s3 = tabela.Rows[i].ItemArray[2].ToString().Substring(0, 10);
+                string s4 = tabela.Rows[i].ItemArray[3].ToString();
+                string s5 = tabela.Rows[i].ItemArray[4].ToString();
+                string s6 = tabela.Rows[i].ItemArray[5].ToString();
+
+                string[] red = { s1, s2, s3, s4, s5, s6 };
+                var ubaci = new ListViewItem(red);
+                listView1.Items.Add(ubaci);
+
+
+
+            }
+            rezultat.Close();
+            konekcija.Close();
+        }
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            load();
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            Form2 f2 = new Form2();
+            f2.ShowDialog();
+        }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                textBox1.Text = listView1.SelectedItems[0].SubItems[0].Text;
+                textBox2.Text = listView1.SelectedItems[0].SubItems[1].Text;
+                textBox3.Text = listView1.SelectedItems[0].SubItems[2].Text;
+                textBox4.Text = listView1.SelectedItems[0].SubItems[3].Text;
+                string zavrsen = listView1.SelectedItems[0].SubItems[4].Text;
+                if (zavrsen == "jeste")
+                {
+                    checkBox1.Checked = true;
+                }
+                else
+                {
+                    checkBox1.Checked = false;
+                }
+                richTextBox1.Text = listView1.SelectedItems[0].SubItems[5].Text;
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "delete from projekat where projekatid=" + textBox1.Text + "";
+
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            rezultat.Close();
+            konekcija.Close();
+            load();//pozivam funkciju DA ponovo ucita i refreshuje sve
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+    }

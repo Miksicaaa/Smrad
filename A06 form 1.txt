@@ -1,0 +1,182 @@
+ public partial class Form1 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        DataTable tabela2 = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost; user id=root; password=asd123; database=polovni_automobili";
+        string razmak = "                                      ";
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT model.ModelID,proizvodjac.Naziv,model.Naziv FROM model INNER JOIN proizvodjac ON model.ProizvodjacID = proizvodjac.ProizvodjacID;";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            int k = tabela.Rows.Count;
+            for (int i = 0; i < k; i++)
+            {
+                string s1 = (tabela.Rows[i].ItemArray[0].ToString() + razmak).Substring(0, 5);
+                string s2 = (tabela.Rows[i].ItemArray[1].ToString() + razmak).Substring(0, 10).TrimEnd();
+                comboBox1.Items.Add(s2);
+                string s3 = (tabela.Rows[i].ItemArray[2].ToString() + razmak).Substring(0, 10);
+
+                listBox1.Items.Add(s1 + s2 + ", " + s3);
+            }
+            rezultat.Close();
+            konekcija.Close();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void listBox1_Click(object sender, EventArgs e)
+        {
+            int k = listBox1.SelectedIndex;
+            textBox1.Text = tabela.Rows[k].ItemArray[2].ToString();
+            textBox4.Text = tabela.Rows[k].ItemArray[0].ToString();
+            comboBox1.Text = tabela.Rows[k].ItemArray[1].ToString();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+
+            upit = "select * from proizvodjac where naziv='" + comboBox1.Text + "'";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+
+            string model = tabela.Rows[0].ItemArray[0].ToString();
+            upit = "UPDATE model SET naziv='" + textBox1.Text + "',proizvodjacid=" + model + " where modelid=" + textBox4.Text + "";
+            MessageBox.Show(upit);
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+
+            //loadddddddddddddddddddddddddddddddddd
+            comboBox1.Items.Clear();
+            listBox1.Items.Clear();
+            upit = "SELECT model.ModelID,proizvodjac.Naziv,model.Naziv FROM model INNER JOIN proizvodjac ON model.ProizvodjacID = proizvodjac.ProizvodjacID;";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            int k = tabela.Rows.Count;
+            for (int i = 0; i < k; i++)
+            {
+                string s1 = (tabela.Rows[i].ItemArray[0].ToString() + razmak).Substring(0, 5);
+                string s2 = (tabela.Rows[i].ItemArray[1].ToString() + razmak).Substring(0, 10).TrimEnd();
+                comboBox1.Items.Add(s2);
+                string s3 = (tabela.Rows[i].ItemArray[2].ToString() + razmak).Substring(0, 10);
+
+                listBox1.Items.Add(s1 + s2 + ", " + s3);
+            }
+            rezultat.Close();
+            konekcija.Close();
+            comboBox1.Text = "";
+            textBox1.Text = "";
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            if (textBox2.Text == "")
+            {
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+
+                comboBox1.Items.Clear();
+                listBox1.Items.Clear();
+                upit = "SELECT model.ModelID,proizvodjac.Naziv,model.Naziv FROM model INNER JOIN proizvodjac ON model.ProizvodjacID = proizvodjac.ProizvodjacID";
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                tabela.Reset();
+                tabela.Load(rezultat);
+                int k = tabela.Rows.Count;
+                for (int i = 0; i < k; i++)
+                {
+                    string s1 = (tabela.Rows[i].ItemArray[0].ToString() + razmak).Substring(0, 5);
+                    string s2 = (tabela.Rows[i].ItemArray[1].ToString() + razmak).Substring(0, 10).TrimEnd();
+                    comboBox1.Items.Add(s2);
+                    string s3 = (tabela.Rows[i].ItemArray[2].ToString() + razmak).Substring(0, 10);
+
+                    listBox1.Items.Add(s1 + s2 + ", " + s3);
+                }
+                rezultat.Close();
+                konekcija.Close();
+            }
+
+            else
+            {
+                konekcija.ConnectionString = temp;
+                konekcija.Open();
+                komanda.Connection = konekcija;
+
+                comboBox1.Items.Clear();
+                listBox1.Items.Clear();
+                upit = "SELECT model.ModelID,proizvodjac.Naziv,model.Naziv FROM model INNER JOIN proizvodjac ON model.ProizvodjacID = proizvodjac.ProizvodjacID where modelid=" + textBox2.Text + "";
+                komanda.CommandText = upit;
+                rezultat = komanda.ExecuteReader();
+                tabela.Reset();
+                tabela.Load(rezultat);
+                int k = tabela.Rows.Count;
+                for (int i = 0; i < k; i++)
+                {
+                    string s1 = (tabela.Rows[i].ItemArray[0].ToString() + razmak).Substring(0, 5);
+                    string s2 = (tabela.Rows[i].ItemArray[1].ToString() + razmak).Substring(0, 10).TrimEnd();
+                    comboBox1.Items.Add(s2);
+                    string s3 = (tabela.Rows[i].ItemArray[2].ToString() + razmak).Substring(0, 10);
+
+                    listBox1.Items.Add(s1 + s2 + ", " + s3);
+                }
+                rezultat.Close();
+                konekcija.Close();
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT proizvodjac.Naziv as Proizvodjac,COUNT(vozilo.VoziloID) as Broj from vozilo INNER JOIN model on vozilo.ModelID=model.ModelID INNER JOIN proizvodjac on model.ProizvodjacID=proizvodjac.ProizvodjacID where PredjenoKM<"+textBox3.Text+" and vozilo.GodinaProizvodnje>="+numericUpDown1.Value.ToString()+" and GodinaProizvodnje<="+ numericUpDown2.Value.ToString() + " group by proizvodjac.Naziv";
+            MessageBox.Show(upit);
+            DataTable tabela2 = new DataTable();
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            chart1.ChartAreas[0].AxisX.Title = "Proizvodjac";
+            chart1.ChartAreas[0].AxisY.Title = "Broj";
+            tabela2.Load(rezultat);
+            dataGridView1.DataSource = tabela2;
+            chart1.DataSource = tabela2;
+            chart1.Series["Series1"].XValueMember = "Proizvodjac";
+            chart1.Series["Series1"].YValueMembers = "Broj";
+
+            rezultat.Close();
+            konekcija.Close();
+        }
+    }

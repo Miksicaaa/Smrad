@@ -1,0 +1,53 @@
+ public partial class Form2 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost;user id=root;password=asd123;database=produzeni_boravak";
+        public Form2()
+        {
+            InitializeComponent();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            chart1.Titles.Clear();
+            //chart1.Titles.Add("grafik prosecne cene");
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT aktivnosti.dan as dani,COUNT(registar_aktivnosti.deteid) as brojdece from aktivnosti INNER JOIN registar_aktivnosti on  aktivnosti.aktivnostid=registar_aktivnosti.aktivnostid GROUP BY aktivnosti.dan";
+
+            DataTable tabela2 = new DataTable();
+
+
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            //chart1.ChartAreas[0].AxisX.Title = "dan";
+            //chart1.ChartAreas[0].AxisY.Title = "broj detda";
+
+
+            tabela2.Load(rezultat);
+            dataGridView1.DataSource = tabela2;
+            chart1.DataSource = tabela2;
+            chart1.Series["prosek"].XValueMember = "dani";
+            chart1.Series["prosek"].YValueMembers = "brojdece";
+
+            rezultat.Close();
+            konekcija.Close();
+        }
+    }

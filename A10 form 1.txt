@@ -1,0 +1,121 @@
+ public partial class Form1 : Form
+    {
+        MySqlConnection konekcija = new MySqlConnection();
+        MySqlCommand komanda = new MySqlCommand();
+        DataTable tabela = new DataTable();
+        DataTable tabela2 = new DataTable();
+        MySqlDataAdapter adapter = new MySqlDataAdapter();
+        DataSet podaci = new DataSet();
+        MySqlDataReader rezultat;
+        string upit;
+        string temp = "server=localhost; user id=root; password=asd123; database=ribolovacko_drustvo";
+        string razmak = "                                      ";
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void pictureBox2_Click(object sender, EventArgs e)
+        {
+            Form2 f2 = new Form2();
+            f2.ShowDialog();
+        }
+
+        private void pictureBox4_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            load();
+        }
+        private void load() {
+
+            listBox1.Items.Clear();
+            comboBox1.Items.Clear();
+            comboBox2.Items.Clear();
+
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT gradid,grad from grad order by grad asc";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            int k = tabela.Rows.Count;
+            for (int i = 0; i < k; i++)
+            {
+                string s1 = tabela.Rows[i].ItemArray[0].ToString();
+                string s2 = tabela.Rows[i].ItemArray[1].ToString();
+                comboBox1.Items.Add(s2);
+                comboBox2.Items.Add(s1);
+            }
+            rezultat.Close();
+            konekcija.Close();
+
+
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "SELECT pecaros.PecarosID,pecaros.Ime,pecaros.Prezime,pecaros.Adresa,grad.Grad,pecaros.Telefon from pecaros INNER JOIN grad on pecaros.GradID=grad.GradID";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            k = tabela.Rows.Count;
+            for (int i = 0; i < k; i++)
+            {
+                string s1 = (tabela.Rows[i].ItemArray[0].ToString() + razmak).Substring(0, 8);
+                string s2 = (tabela.Rows[i].ItemArray[1].ToString() + razmak).Substring(0, 15);
+                string s3 = (tabela.Rows[i].ItemArray[2].ToString() + razmak).Substring(0, 15);
+                string s4 = (tabela.Rows[i].ItemArray[3].ToString() + razmak).Substring(0, 25);
+                string s5 = (tabela.Rows[i].ItemArray[4].ToString() + razmak).Substring(0, 25);
+                string s6 = (tabela.Rows[i].ItemArray[5].ToString() + razmak).Substring(0, 15);
+                listBox1.Items.Add(s1 + s2 + s3 + s4 + s5 + s6);
+            }
+            rezultat.Close();
+            konekcija.Close();
+
+            textBox1.Text = "";
+            textBox2.Text = "";
+            textBox3.Text = "";
+            textBox4.Text = "";
+            textBox6.Text = "";
+            comboBox1.ResetText();
+
+        }
+
+        private void listBox1_Click(object sender, EventArgs e)
+        {
+            int k = listBox1.SelectedIndex;
+            textBox1.Text = tabela.Rows[k].ItemArray[0].ToString();
+            textBox2.Text = tabela.Rows[k].ItemArray[1].ToString();
+            textBox3.Text = tabela.Rows[k].ItemArray[2].ToString();
+            textBox4.Text = tabela.Rows[k].ItemArray[3].ToString();
+            comboBox1.Text = tabela.Rows[k].ItemArray[4].ToString();
+            textBox6.Text = tabela.Rows[k].ItemArray[5].ToString();
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            comboBox2.SelectedIndex = comboBox1.SelectedIndex;
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            konekcija.ConnectionString = temp;
+            konekcija.Open();
+            komanda.Connection = konekcija;
+            upit = "UPDATE Pecaros SET Ime='" + textBox2.Text + "',Prezime='" + textBox3.Text + "',Adresa='" + textBox4.Text + "',Telefon='" + textBox6.Text + "',GradID=" + comboBox2.Text + " where PecarosID=" + textBox1.Text + "";
+            komanda.CommandText = upit;
+            rezultat = komanda.ExecuteReader();
+            tabela.Reset();
+            tabela.Load(rezultat);
+            rezultat.Close();
+            konekcija.Close();
+            load();
+            MessageBox.Show("Izmenjeno!");
+        }
+    }

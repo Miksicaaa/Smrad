@@ -1,0 +1,33 @@
+ public partial class Form2 : Form
+    {
+        Form1 f1 = new Form1();
+        public Form2()
+        {
+            InitializeComponent();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (textBox1.Text != "")
+            {
+                Form1.upit1 = "select stadion.stadionid,stadion.naziv,grad.grad,stadion.kapacitet,stadion.adresa,stadion.brojulaza,grad.gradid from stadion inner JOIN grad on grad.gradid=stadion.gradid inner join drzava on drzava.drzavaid=grad.gradid where drzava.naziv='" + textBox1.Text + "'";
+                Form1.radi = 1;
+                this.Close();
+            }
+            else {
+                Form1.upit1 = "select stadion.stadionid,stadion.naziv,grad.grad,stadion.kapacitet,stadion.adresa,stadion.brojulaza,grad.gradid from stadion inner JOIN grad on grad.gradid=stadion.gradid inner join drzava on drzava.drzavaid=grad.gradid";
+                Form1.radi = 1;
+                this.Close();
+            }
+        }
+
+        private void Form2_Load(object sender, EventArgs e)
+        {
+
+        }
+    }
